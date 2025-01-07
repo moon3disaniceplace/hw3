@@ -1,0 +1,42 @@
+└──Funcs
+    ├──FuncDecl
+    │   ├──ID: tiser
+    │   ├──Type: int
+    │   ├──Formals
+    │   │   └──Formal
+    │   │       ├──ID: a
+    │   │       └──Type: int
+    │   └──Statements
+    │       ├──VarDecl
+    │       │   ├──ID: b
+    │       │   ├──Type: int
+    │       │   └──Num: 0
+    │       ├──While
+    │       │   ├──ID: a
+    │       │   └──Statements
+    │       │       ├──If
+    │       │       │   ├──And
+    │       │       │   │   ├──ID: a
+    │       │       │   │   └──Num: 1
+    │       │       │   └──Assign
+    │       │       │       ├──ID: b
+    │       │       │       └──BinOp: +
+    │       │       │           ├──ID: b
+    │       │       │           └──Num: 1
+    │       │       └──Assign
+    │       │           ├──ID: a
+    │       │           └──BinOp: /
+    │       │               ├──ID: a
+    │       │               └──Num: 2
+    │       └──Return
+    │           └──ID: b
+    └──FuncDecl
+        ├──ID: main
+        ├──Type: int
+        ├──Formals
+        └──Statements
+            └──Return
+                └──Call
+                    ├──ID: tiser
+                    └──ExpList
+                        └──Num: 0

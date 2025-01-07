@@ -13,4 +13,5 @@ int main() {
     // Print the AST using the PrintVisitor
     output::PrintVisitor printVisitor;
     program->accept(printVisitor);
+    //remember to add my new visitor
 }

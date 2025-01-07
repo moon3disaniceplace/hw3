@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace output {
-    /* Helper functions */
+    // Helper functions
 
     static std::string toString(ast::BuiltInType type) {
         switch (type) {
@@ -21,7 +21,7 @@ namespace output {
         }
     }
 
-    /* Error handling functions */
+    // Error handling functions 
 
     void errorLex(int lineno) {
         std::cout << "line " << lineno << ": lexical error\n";
@@ -96,7 +96,7 @@ namespace output {
         exit(0);
     }
 
-    /* ScopePrinter class */
+    // ScopePrinter class 
 
     ScopePrinter::ScopePrinter() : indentLevel(0) {}
 
@@ -143,3 +143,5 @@ namespace output {
         return os;
     }
 }
+
+

@@ -32,7 +32,8 @@ namespace ast {
         BOOL,
         BYTE,
         INT,
-        STRING
+        STRING,
+        NO_TYPE
     };
 
     /* Base class for all AST nodes */
@@ -40,7 +41,7 @@ namespace ast {
     public:
         // Line number in the source code
         int line;
-
+        ast::BuiltInType type;
         // Use this constructor only while parsing in bison or flex
         Node();
 

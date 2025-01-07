@@ -4,26 +4,6 @@
 
 extern int yylineno;
 
-class Call : public Exp, public Statement {
-public:
-    // Function identifier
-    std::shared_ptr<ID> func_id;
-    // List of arguments as expressions
-    std::shared_ptr<ExpList> args;
-
-    // Constructor that receives the function identifier and the list of arguments
-    Call(std::shared_ptr<ID> func_id, std::shared_ptr<ExpList> args);
-
-    // Constructor that receives only the function identifier (for parameterless functions)
-    explicit Call(std::shared_ptr<ID> func_id);
-
-    void accept(Visitor& visitor) override {
-        visitor.visit(*this);
-    }
-};
-
-
-
 namespace ast {
 
     Node::Node() : line(yylineno) {}

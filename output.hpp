@@ -1,3 +1,4 @@
+
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
@@ -8,7 +9,6 @@
 #include "nodes.hpp"
 
 namespace output {
-    /* Error handling functions */
 
     void errorLex(int lineno);
 
@@ -36,9 +36,6 @@ namespace output {
 
     void errorByteTooLarge(int lineno, int value);
 
-    /* ScopePrinter class
-     * This class is used to print scopes in a human-readable format.
-     */
     class ScopePrinter {
     private:
         std::stringstream globalsBuffer;
