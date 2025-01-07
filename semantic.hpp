@@ -6,7 +6,10 @@
 
 //need to add scopes + semantic analysis
 class SemanticVisitor : public Visitor {
+output::ScopePrinter printer;
 SymbolTable table;
+int insideFunction;
+int insideWhile; //remember them
 public:
     void visit(ast::Num &node);
 

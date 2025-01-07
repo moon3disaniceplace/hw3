@@ -5,20 +5,30 @@
 //need to add scopes + semantic analysis
     void SemanticVisitor::visit(ast::Num &node){
         node.type = ast::BuiltInType::INT;
-    }
+    } //good
 
     void SemanticVisitor::visit(ast::NumB &node){
         node.type = ast::BuiltInType::BYTE;
-    }
+        if(node.value > 255){
+            output::errorByteTooLarge(node.line, node.value);
+        }
+    } //good
 
     void SemanticVisitor::visit(ast::String &node){
         node.type = ast::BuiltInType::STRING;
-    }
+    } //good
 
     void SemanticVisitor::visit(ast::Bool &node){
         node.type = ast::BuiltInType::BOOL;
-    }
-    void SemanticVisitor::visit(ast::ID &node){} //just the name of the variable
+    } //good
+
+    void SemanticVisitor::visit(ast::ID &node){
+        node.type = table.isDefined(node.value);
+        if(node.type == ast::BuiltInType::NO_TYPE){
+            output::errorUndef(node.line, node.value);
+        }
+    } 
+    //we need to use this function to check if the variable is defined or not
 
     void SemanticVisitor::SemanticVisitor::visit(ast::BinOp &node){
         node.left->accept(*this);
@@ -72,8 +82,7 @@
         }
     }
 
-    void SemanticVisitor::visit(ast::Type &node){};    
-
+    void SemanticVisitor::visit(ast::Type &node){};   //dont need to do anything
 
     void SemanticVisitor::visit(ast::Cast &node){
         node.exp->accept(*this);
@@ -98,6 +107,18 @@
     void SemanticVisitor::visit(ast::Call &node){
         node.args->accept(*this);
         //check in the table if exist function with the same name and the same arguments
+        auto findFunction = table.findFunction(node);
+        if(findFunction == nullptr){
+            output::errorUndefFunc(node.line, node.func_id->value);
+        }
+        if(findFunction->parameters.size() != node.args->exps.size()){
+            output::errorPrototypeMismatch(node.line, node.func_id->value, findFunction->parameters);
+        }
+        for (int i = 0; i < table.; i++)
+        {
+            /* code */
+        }
+        
         node.type = findFunction->type; //the return type of the function
 
     }
@@ -109,13 +130,18 @@
     }
 
     void SemanticVisitor::visit(ast::Break &node){
+        if (insideWhile == 0){
+            output::errorUnexpectedBreak(node.line); 
+        }
         //check if we are in a while loop
-
-    }
+    } //good
 
     void SemanticVisitor::visit(ast::Continue &node){
+        if (insideWhile == 0){
+            output::errorUnexpectedContinue(node.line); 
+        }
         //check if we are in a while loop
-    }
+    } //good
 
     void SemanticVisitor::visit(ast::Return &node){
         if (node.exp) {
@@ -124,16 +150,33 @@
     }
 
     void SemanticVisitor::visit(ast::If &node){
+        table.beginScope();
         node.condition->accept(*this);
+        table.beginScope();
         node.then->accept(*this);
+        table.endScope();
+        table.endScope();
         if (node.otherwise) {
+            table.beginScope();
+            table.beginScope();
             node.otherwise->accept(*this);
+            table.endScope();
+            table.endScope();
         }
     }
 
     void SemanticVisitor::visit(ast::While &node){
+        insideWhile++;
+        table.beginScope();
         node.condition->accept(*this);
+        if(node.condition->type != ast::BuiltInType::BOOL){
+            output::errorMismatch(node.line);
+        }
+        table.beginScope();
         node.body->accept(*this);
+        table.endScope();
+        table.endScope();
+        insideWhile--;
     }
 
     void SemanticVisitor::visit(ast::VarDecl &node){
@@ -143,24 +186,26 @@
             node.init_exp->accept(*this);
             
             if(node.init_exp->type != node.type->type && !(node.init_exp->type == ast::BuiltInType::BYTE && node.type == ast::BuiltInType::INT)){ //auto casting from byte to int
-                //throw std::runtime_error("Type mismatch"); //should print right error
+                output::errorMismatch(node.line);
             }
         }
     }
 
     void SemanticVisitor::visit(ast::Assign &node){
-        node.id->accept(*this);
+        //node.id->accept(*this);
         node.exp->accept(*this);
     }
 
     void SemanticVisitor::visit(ast::Formal &node){
-        node.id->accept(*this);
-        node.type->accept(*this);
+        table.declareVariable(node.id->value, node.type->type);
+        //node.id->accept(*this);
+        //node.type->accept(*this);
     }
 
     void SemanticVisitor::visit(ast::Formals &node) {
-        for (const auto &formal : node.formals) {
-            formal->accept(*this);
+        for (auto i = node.formals.size(); i >= 1; i++)
+        {
+            table.declareVariableOfFunction(node.formals[i-1]->id->value, node.formals[i-1]->type->type, i);
         }
     }
 
@@ -184,6 +229,10 @@
                 paramTypes.push_back(formal->type->type);
             }
             printer.emitFunc(func->id->value, func->return_type->type, paramTypes);
+        }
+        //check if there is a main function
+        if (table.functions.find("main") == table.functions.end()) {
+            output::errorMainMissing();
         }
         
         for (auto func : node.funcs) {

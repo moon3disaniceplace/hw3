@@ -12,7 +12,6 @@ Function::Function(ast::BuiltInType return_type, std::vector<ast::BuiltInType> p
 SymbolTable::SymbolTable() : currentOffset(0) { scopes.push_back({}); offsets.push(0); }
 
 void SymbolTable::beginScope() {
-    beginScope();
     scopes.push_back({});
     offsets.push(currentOffset);
 }
@@ -24,8 +23,8 @@ void SymbolTable::endScope() {
 }
 
 bool SymbolTable::declareVariable(const std::string &name, const ast::BuiltInType &type) {
+    if(isDefined(name) != ast::BuiltInType::UNKNOWN){} //return false; // Redefinition
     auto &currentScope = *scopes.rbegin();
-    if (currentScope.find(name) != currentScope.end()) return false; // Redefinition
     currentScope[name] = std::make_shared<Symbol>(type, currentOffset); //Assuming all variables have size 1 (change later when converting to asmmbly)
     offsets.top() = ++currentOffset;
     return true;
@@ -36,6 +35,7 @@ ast::BuiltInType SymbolTable::isDefined(const std::string &name) {
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         if (it->find(name) != it->end()) return it->find(name)->type;
     }
+    return ast::BuiltInType::NO_TYPE;
     //error
 
 }
@@ -66,4 +66,11 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
         //else return error; //type mismatch
     }
     return function;
+}
+
+
+void SymbolTable::declareVariableOfFunction(const std::string &name, const ast::BuiltInType &type, int offset_function){
+    if(isDefined(name) != ast::BuiltInType::UNKNOWN){} //return false; // Redefinition
+    auto &currentScope = *scopes.rbegin();
+    currentScope[name] = std::make_shared<Symbol>(type, currentOffset-offset_function); //Assuming all variables have size 1 (change later when converting to asmmbly)
 }

@@ -143,8 +143,6 @@ namespace output {
         enter_child();
         node.left->accept(*this);
         leave_child();
-
-
         enter_last_child();
         node.right->accept(*this);
         leave_child();
