@@ -67,7 +67,7 @@ bool SymbolTable::isDefined(const std::string &name, int line) {
 
 void SymbolTable::declareFunction(const ast::FuncDecl &node){ //function can only be declared in the global scope
     if (functions.find(node.id->value) != functions.end()){
-        output::errorDef(node.line, node.id->value);
+        output::errorDef(node.id->line, node.id->value);
     } //return error; // Redefinition
     std::vector<ast::BuiltInType> parameters;
     for (auto formal : node.formals->formals){
@@ -90,7 +90,7 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
     std::vector<std::string> req_types;
     for (auto parameter : function->parameters)
     {
-        req_types.push_back(output::toString(parameter));
+        req_types.push_back(output::toStringUpper(parameter));
     }
     if(function->parameters.size() != node.args->exps.size()){
         output::errorPrototypeMismatch(node.line, node.func_id->value,req_types);
@@ -100,8 +100,9 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
         if(function->parameters[i] == node.args->exps[i]->type){
             continue;
         }
-        else if(function->parameters[i] == ast::BuiltInType::BYTE && node.args->exps[i]->type == ast::BuiltInType::INT){
-            node.args->exps[i]->type = ast::BuiltInType::BYTE; //auto casting from int to byte
+        else if(function->parameters[i] == ast::BuiltInType::INT && node.args->exps[i]->type == ast::BuiltInType::BYTE){
+            node.args->exps[i]->type = ast::BuiltInType::INT; //auto casting from byte to int
+            continue;
         }
         output::errorPrototypeMismatch(node.line, node.func_id->value,req_types);
     }
@@ -110,6 +111,9 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
 
 
 void SymbolTable::declareVariableOfFunction(const std::string &name, const ast::BuiltInType &type, int offset_function,int line){
+    if(functions.find(name) != functions.end()){
+        output::errorDef(line, name);
+    } //return false; // Redefinition
     if(isDefined(name,line)){
         output::errorDef(line, name);
     } // Redefinition

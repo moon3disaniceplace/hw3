@@ -10,6 +10,7 @@
 
 namespace output {
     std::string toString(ast::BuiltInType type);
+    std::string toStringUpper(ast::BuiltInType type);
     void errorLex(int lineno);
 
     void errorSyn(int lineno);

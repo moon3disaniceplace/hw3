@@ -1,6 +1,8 @@
-#include "semantic.hpp"
 #ifndef SEMANTIC_CPP
 #define SEMANTIC_CPP
+#include "semantic.hpp"
+#include <iostream>
+
 
 //need to add scopes + semantic analysis
     void SemanticVisitor::visit(ast::Num &node){
@@ -52,7 +54,7 @@
     void SemanticVisitor::visit(ast::RelOp &node){
         node.left->accept(*this);
         node.right->accept(*this);
-        if((node.left->type != ast::BuiltInType::INT && node.left->type != ast::BuiltInType::BYTE) && (node.right->type != ast::BuiltInType::INT && node.right->type != ast::BuiltInType::BYTE)){
+        if((node.left->type != ast::BuiltInType::INT && node.left->type != ast::BuiltInType::BYTE) || (node.right->type != ast::BuiltInType::INT && node.right->type != ast::BuiltInType::BYTE)){
             output::errorMismatch(node.line);
         }
         node.type = ast::BuiltInType::BOOL; //the result of the relational operation is always a boolean
@@ -93,12 +95,20 @@
         //only int to byte or vice versa is allowed
         if(node.target_type->type == ast::BuiltInType::INT &&  node.exp->type == ast::BuiltInType::BYTE){ //casting from byte to int
             node.exp->type = ast::BuiltInType::INT;
+            node.type = ast::BuiltInType::INT;
         }
-        if(node.target_type->type == ast::BuiltInType::BYTE &&  node.exp->type == ast::BuiltInType::INT){ //casting from int to byte
+        else if(node.target_type->type == ast::BuiltInType::BYTE &&  node.exp->type == ast::BuiltInType::INT){ //casting from int to byte
             node.exp->type = ast::BuiltInType::BYTE;
+            node.type = ast::BuiltInType::BYTE;
         }
-        if(node.target_type->type != node.exp->type){ //problem with casting
+        else if(node.target_type->type != node.exp->type){ //problem with casting
             output::errorMismatch(node.line);
+        }
+        else if(!(node.target_type->type == ast::BuiltInType::INT || node.target_type->type == ast::BuiltInType::BYTE)){
+            output::errorMismatch(node.line);
+        }
+        else{
+            node.type = node.target_type->type;
         }
     }
 
@@ -115,9 +125,13 @@
     }
 
     void SemanticVisitor::visit(ast::Statements &node){
+        table.beginScope();
+        printer.beginScope();
         for (const auto &statement : node.statements) {
             statement->accept(*this);
         }
+        table.endScope();
+        printer.endScope();
     }
 
     void SemanticVisitor::visit(ast::Break &node){
@@ -158,23 +172,15 @@
         printer.beginScope();
         node.condition->accept(*this);
         if(node.condition->type != ast::BuiltInType::BOOL){
-            output::errorMismatch(node.line);
+            output::errorMismatch(node.condition->line);
         }
-        table.beginScope();
-        printer.beginScope();
         node.then->accept(*this);
-        table.endScope();
-        printer.endScope();
         table.endScope();
         printer.endScope();
         if (node.otherwise) {
             table.beginScope();
             printer.beginScope();
-            table.beginScope();
-            printer.beginScope();
             node.otherwise->accept(*this);
-            table.endScope();
-            printer.endScope();
             table.endScope();
             printer.endScope();
         }
@@ -186,20 +192,15 @@
         printer.beginScope();
         node.condition->accept(*this);
         if(node.condition->type != ast::BuiltInType::BOOL){
-            output::errorMismatch(node.line);
+            output::errorMismatch(node.condition->line);
         }
-        table.beginScope();
-        printer.beginScope();
         node.body->accept(*this);
-        table.endScope();
-        printer.endScope();
         table.endScope();
         printer.endScope();
         insideWhile--;
     }
 
     void SemanticVisitor::visit(ast::VarDecl &node){
-        table.declareVariable(node.id->value, node.type->type, node.line);
         printer.emitVar(node.id->value, node.type->type, table.currentOffset);
         if (node.init_exp) {
             node.init_exp->accept(*this);
@@ -210,6 +211,7 @@
                 output::errorMismatch(node.line);
             }
         }
+        table.declareVariable(node.id->value, node.type->type, node.line);
     }
 
     void SemanticVisitor::visit(ast::Assign &node){
@@ -243,13 +245,18 @@
         //node.id->accept(*this); surly we dont need to get inside the id
         node.formals->accept(*this); //need!
         returnType = node.return_type->type;
-        node.body->accept(*this); //need!
+        for (auto statement : node.body->statements)
+        {
+            statement->accept(*this);
+        }
+        
         table.endScope();
         printer.endScope();
     }
 
     void SemanticVisitor::visit(ast::Funcs &node) {
         //declare all functions in the table
+        insideWhile = 0;
         printer.emitFunc("print", ast::BuiltInType::VOID, {ast::BuiltInType::STRING});
         printer.emitFunc("printi", ast::BuiltInType::VOID, {ast::BuiltInType::INT});
         for (auto func : node.funcs) {
@@ -262,6 +269,12 @@
         }
         //check if there is a main function
         if (table.functions.find("main") == table.functions.end()) {
+            output::errorMainMissing();
+        }
+        if(table.functions["main"]->parameters.size()!=0){
+            output::errorMainMissing();
+        }
+        if(table.functions["main"]->ret_type!=ast::BuiltInType::VOID){
             output::errorMainMissing();
         }
         

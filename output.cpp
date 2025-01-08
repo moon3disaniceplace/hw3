@@ -21,6 +21,23 @@ namespace output {
         }
     }
 
+    std::string toStringUpper(ast::BuiltInType type) {
+        switch (type) {
+            case ast::BuiltInType::INT:
+                return "INT";
+            case ast::BuiltInType::BOOL:
+                return "BOOL";
+            case ast::BuiltInType::BYTE:
+                return "BYTE";
+            case ast::BuiltInType::VOID:
+                return "VOID";
+            case ast::BuiltInType::STRING:
+                return "STRING";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
     // Error handling functions 
 
     void errorLex(int lineno) {
