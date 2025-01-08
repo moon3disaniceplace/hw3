@@ -272,6 +272,6 @@ Exp:
 
 %%
 
-void yyor(const char*){
+void yyerror(const char*){
     output::errorSyn(yylineno); //check later
 }
