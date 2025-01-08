@@ -1,0 +1,9 @@
+void main() {
+	int x=3;
+	byte this = 4b;
+	int b = x + this;
+	byte sec = 2b;
+	byte third = this + sec;
+	int c = this + x;
+	int d = this + x + sec + third;
+}

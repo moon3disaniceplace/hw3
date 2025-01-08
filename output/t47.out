@@ -1,0 +1,8 @@
+---begin global scope---
+print (string) -> void
+printi (int) -> void
+main (int) -> void
+  ---begin scope---
+  x int -1
+  ---end scope---
+---end global scope---

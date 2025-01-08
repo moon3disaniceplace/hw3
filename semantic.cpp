@@ -110,7 +110,6 @@
 
     void SemanticVisitor::visit(ast::Call &node){
         node.args->accept(*this);
-        //check in the table if exist function with the same name and the same arguments
         node.type = table.findFunction(node)->ret_type;//the return type of the function
     }
 
@@ -200,7 +199,7 @@
 
     void SemanticVisitor::visit(ast::VarDecl &node){
         table.declareVariable(node.id->value, node.type->type, node.line);
-        printer.emitVar(node.id->value, node.type->type, table.currentOffset);
+        printer.emitVar(node.id->value, node.type->type, table.currentOffset-1);
         if (node.init_exp) {
             node.init_exp->accept(*this);
             if(node.init_exp->type == ast::BuiltInType::BYTE && node.type->type == ast::BuiltInType::INT){ //auto casting from byte to int
@@ -226,7 +225,7 @@
     } //dont sure why to use
 
     void SemanticVisitor::visit(ast::Formals &node) {
-        for (auto i = node.formals.size(); i >= 1; i++)
+        for (auto i = node.formals.size(); i >= 1; i--)
         {
             table.declareVariableOfFunction(node.formals[i-1]->id->value, node.formals[i-1]->type->type, i, node.line);
         }
@@ -249,10 +248,9 @@
     }
 
     void SemanticVisitor::visit(ast::Funcs &node) {
-        //declare all functions in the table
         printer.emitFunc("print", ast::BuiltInType::VOID, {ast::BuiltInType::STRING});
         printer.emitFunc("printi", ast::BuiltInType::VOID, {ast::BuiltInType::INT});
-        for (auto func : node.funcs) {
+        for (auto func : node.funcs) {  
             table.declareFunction(*func);
             std::vector<ast::BuiltInType> paramTypes;
             for (auto formal : func->formals->formals) {
@@ -260,11 +258,9 @@
             }
             printer.emitFunc(func->id->value, func->return_type->type, paramTypes);
         }
-        //check if there is a main function
-        if (table.functions.find("main") == table.functions.end()) {
+        if (table.functions.find("main") == table.functions.end()) {// if main isnt added we exit
             output::errorMainMissing();
         }
-        
         for (auto func : node.funcs) {
             func->accept(*this);
         }

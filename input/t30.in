@@ -1,0 +1,7 @@
+void main() {
+	print("ok");
+}
+
+int x(int a, bool b) {
+	int c;
+}

@@ -1,0 +1,4 @@
+void main() {
+    print("Hello, World!"); // Valid
+    printi(42);              // Valid
+}

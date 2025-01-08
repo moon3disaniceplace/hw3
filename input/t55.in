@@ -1,0 +1,176 @@
+void displayBanner() {
+    print("************************************************************");
+    print("* Welcome to the Ultimate FanC Semantic Analyzer Stress Test *");
+    print("************************************************************");
+}
+
+// Deeply nested arithmetic and relational expressions
+int nestedArithmeticAndRelational(int a, int b, byte c, bool flag) {
+    int result = 0;
+    if (flag) {
+        result = (((a + b) * (int)c - (b / c)) - (a - b + (int)c)) +
+                 (((b * c) + a) - ((c - a) + b));
+    } else {
+        result = ((a - b) * ((c + b) - a)) + (((b * (int)c) / a) - (c + b));
+    }
+    while (result > 0) {
+        result = result - 1;
+    }
+    return result;
+}
+
+// Complex nested scopes with shadowing checks
+void testScopes(int x, byte y, bool condition) {
+    {
+        int shadow = x + y;
+        while (shadow > 0) {
+            if (condition) {
+                {
+                    byte shadow1 = y / 2b; // New shadowed variable
+                    printi((int)shadow + x);
+                }
+            } else {
+                printi(shadow);
+            }
+            shadow = shadow - 1;
+        }
+    }
+    print("Scope test completed.");
+}
+
+// Extremely long logical expressions
+bool longLogicalExpression(bool a, bool b, bool c, bool d, bool e) {
+    return ((a and not b) or (c and d)) and ((not e or b) and (a or not d));
+}
+
+// Recursive Fibonacci calculation
+int recursiveFibonacci(int n) {
+    if (n <= 1) {
+        return n;
+    }
+    return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
+}
+
+// Function with many parameters and diverse types
+int calculateWithManyParameters(int a, byte b, bool c, int d, byte e, bool f) {
+    int result = 0;
+    if (c and f) {
+        result = ((a + d) * (b + e)) / ((a - e) - b);
+    } else {
+        result = ((d - a) + (e / b)) - (int)b * a;
+    }
+    return result;
+}
+
+// Testing while loops with deeply nested scopes
+void nestedWhileLoopTest() {
+    int i = 0;
+    while (i < 10) {
+        int j = 0;
+        while (j < i) {
+            byte k = 5b;
+            {
+                if ((i + j) - (int)k == 0) {
+                    printi(i * j);
+                } else {
+                    printi(i + j);
+                }
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+// Testing deeply nested if-else statements
+bool testDeeplyNestedIfElse(int x, int y, byte z) {
+    if (x > y) {
+        if (z < x) {
+            if ((x + y) - z == 0) {
+                return true;
+            } else {
+                if ((x - y) > z) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } else {
+            return false;
+        }
+    } else {
+        if (y > z) {
+            return true;
+        } else {
+            if ((x - z) == 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Extremely large calculations with conversions
+void largeCalculations() {
+    int a = 500;
+    byte b = 50b;
+    int result = 0;
+
+    result = ((a + b) * ((int)b / (a - b))) +
+             (((a - b) + (b * a)) - (a / (int)b));
+
+    printi(result);
+}
+
+// Master function to call everything
+void masterTestSuite() {
+    displayBanner();
+
+    int arithResult = nestedArithmeticAndRelational(100, 50, 25b, true);
+    printi(arithResult);
+
+    testScopes(200, 30b, true);
+
+    bool logicalResult = longLogicalExpression(true, false, true, false, true);
+    if (logicalResult) {
+        print("Logical expression passed.");
+    } else {
+        print("Logical expression failed.");
+    }
+
+    int fibResult = recursiveFibonacci(10);
+    printi(fibResult);
+
+    int paramResult = calculateWithManyParameters(500, 50b, true, 300, 10b, false);
+    printi(paramResult);
+
+    nestedWhileLoopTest();
+
+    bool nestedIfResult = testDeeplyNestedIfElse(100, 50, 25b);
+    if (nestedIfResult) {
+        print("Deeply nested if-else passed.");
+    } else {
+        print("Deeply nested if-else failed.");
+    }
+
+    largeCalculations();
+}
+
+// Testing implicit and explicit conversions
+void testConversions() {
+    byte small = 10b;
+    int large = 1000;
+
+    int mixed = small + (int)large - ((int)small * large);
+    printi(mixed);
+
+    mixed = (byte)(large - 255) + small;
+    printi(mixed);
+}
+
+// Call everything
+void main() {
+    masterTestSuite();
+    testConversions();
+    print("All tests completed successfully.");
+}

@@ -23,13 +23,14 @@ class Function{
 
 class SymbolTable {
 public:
-    std::stack<int> offsets; // Stack of offsets (one for each scope)
-    std::vector<std::unordered_map<std::string, std::shared_ptr<Symbol>>> scopes; // Stack of scopes (each scope is a map from variable names to symbols)
-    std::unordered_map<std::string, std::shared_ptr<Function>> functions; // Map from function names to function symbols
+    std::stack<int> offsets; 
+    std::vector<std::unordered_map<std::string, std::shared_ptr<Symbol>>> scopes; 
+    std::unordered_map<std::string, std::shared_ptr<Function>> functions; 
     int currentOffset;
     SymbolTable();
     void beginScope();
     void endScope();
+
     bool declareParameter(const std::string &name, const ast::BuiltInType &type, int offset); //need?
     bool declareVariable(const std::string &name, const ast::BuiltInType &type, int line);
     bool isDefined(const std::string &name, int line);

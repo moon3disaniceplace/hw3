@@ -9,6 +9,8 @@
 Symbol::Symbol(ast::BuiltInType type, int offset) : type(type), offset(offset) {}
 //create constructor for function
 Function::Function(ast::BuiltInType return_type, std::vector<ast::BuiltInType> parameters) : ret_type(return_type), parameters(parameters) {}
+
+
 SymbolTable::SymbolTable() : currentOffset(0) { 
     scopes.push_back({});
     offsets.push(0); 
@@ -22,6 +24,7 @@ SymbolTable::SymbolTable() : currentOffset(0) {
 }
 
 void SymbolTable::beginScope() {
+    //add empty scope to the list
     scopes.push_back({});
     offsets.push(currentOffset);
 }
@@ -31,6 +34,8 @@ void SymbolTable::endScope() {
     offsets.pop();
     currentOffset = offsets.top();
 }
+
+
 
 bool SymbolTable::declareVariable(const std::string &name, const ast::BuiltInType &type, int line) {
     if(isDefined(name,line)){
@@ -42,8 +47,9 @@ bool SymbolTable::declareVariable(const std::string &name, const ast::BuiltInTyp
     return true;
 }
 
+
+
 ast::BuiltInType SymbolTable::findVar(const std::string &name) {
-    //start by searching the current scope and then go down the stack
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         if (it->find(name) != it->end()) return it->find(name)->second->type;
     }
@@ -56,7 +62,6 @@ ast::BuiltInType SymbolTable::findVar(const std::string &name) {
 bool SymbolTable::isDefined(const std::string &name, int line) {
     //start by check its not a function
     if (functions.find(name) != functions.end()) output::errorDefAsFunc(line, name);
-    //start by searching the current scope and then go down the stack
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         if (it->find(name) != it->end()) return 1;
     }
@@ -66,7 +71,7 @@ bool SymbolTable::isDefined(const std::string &name, int line) {
 }
 
 void SymbolTable::declareFunction(const ast::FuncDecl &node){ //function can only be declared in the global scope
-    if (functions.find(node.id->value) != functions.end()){
+    if (functions.find(node.id->value) != functions.end()){ //if function already exists in functions its an error
         output::errorDef(node.line, node.id->value);
     } //return error; // Redefinition
     std::vector<ast::BuiltInType> parameters;
@@ -76,9 +81,10 @@ void SymbolTable::declareFunction(const ast::FuncDecl &node){ //function can onl
     functions[node.id->value] = std::make_shared<Function>(node.return_type->type, parameters);
 }
 
+#include <algorithm>
+
 //function can be declared in the global scope only
 std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
-    //check if the function isnt defined as variable
     if (functions.find(node.func_id->value) == functions.end()){
         if (isDefined(node.func_id->value, node.line)) {
             output::errorDefAsVar(node.line, node.func_id->value);
@@ -89,8 +95,10 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
 
     std::vector<std::string> req_types;
     for (auto parameter : function->parameters)
-    {
-        req_types.push_back(output::toString(parameter));
+    {   
+        std::string s(output::toString(parameter));
+        std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+        req_types.push_back(s);
     }
     if(function->parameters.size() != node.args->exps.size()){
         output::errorPrototypeMismatch(node.line, node.func_id->value,req_types);
@@ -103,7 +111,7 @@ std::shared_ptr<Function> SymbolTable::findFunction(const ast::Call &node){
         else if(function->parameters[i] == ast::BuiltInType::BYTE && node.args->exps[i]->type == ast::BuiltInType::INT){
             node.args->exps[i]->type = ast::BuiltInType::BYTE; //auto casting from int to byte
         }
-        output::errorPrototypeMismatch(node.line, node.func_id->value,req_types);
+        output::errorPrototypeMismatch(node.line,node.func_id->value,req_types);
     }
     return function;
 }
