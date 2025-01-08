@@ -31,12 +31,13 @@ public:
     void beginScope();
     void endScope();
     bool declareParameter(const std::string &name, const ast::BuiltInType &type, int offset); //need?
-    bool declareVariable(const std::string &name, const ast::BuiltInType &type);
-    ast::BuiltInType isDefined(const std::string &name);
+    bool declareVariable(const std::string &name, const ast::BuiltInType &type, int line);
+    bool isDefined(const std::string &name, int line);
     void declareFunction(const ast::FuncDecl &node);
     std::shared_ptr<Function> findFunction(const ast::Call &node);
-    void declareVariableOfFunction(const std::string &name, const ast::BuiltInType &type, int offset);
-
+    void declareVariableOfFunction(const std::string &name, const ast::BuiltInType &type, int offset_function,int line);
+    ast::BuiltInType findVar(const std::string &name);
+    
 };
 
 

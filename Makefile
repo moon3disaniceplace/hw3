@@ -8,4 +8,4 @@ all: clean
 	bison -Wcounterexamples -d parser.y
 	$(CC) $(CFLAGS) -o os- *.c *.cpp
 clean:
-	rm -f lex.yy.* parser.tab.* os-
+	rm -f lex.yy.* parser.tab.* hw3

@@ -9,7 +9,7 @@
 #include "nodes.hpp"
 
 namespace output {
-
+    std::string toString(ast::BuiltInType type);
     void errorLex(int lineno);
 
     void errorSyn(int lineno);
