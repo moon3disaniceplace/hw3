@@ -226,7 +226,7 @@
     } //dont sure why to use
 
     void SemanticVisitor::visit(ast::Formals &node) {
-        for (auto i = node.formals.size(); i >= 1; i++)
+        for (auto i = node.formals.size(); i >= 1; i--)
         {
             table.declareVariableOfFunction(node.formals[i-1]->id->value, node.formals[i-1]->type->type, i, node.line);
         }
