@@ -1,7 +1,6 @@
 #ifndef SEMANTIC_CPP
 #define SEMANTIC_CPP
 #include "semantic.hpp"
-#include <iostream>
 
 
 //need to add scopes + semantic analysis
