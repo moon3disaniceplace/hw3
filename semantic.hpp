@@ -1,8 +1,9 @@
+#ifndef SEMANTIC_HPP
+#define SEMANTIC_HPP
 #include "nodes.hpp"
 #include "tables.hpp"
 #include "visitor.hpp"
-#ifndef SEMANTIC_HPP
-#define SEMANTIC_HPP
+
 
 //need to add scopes + semantic analysis
 class SemanticVisitor : public Visitor {
